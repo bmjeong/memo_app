@@ -43,6 +43,27 @@ def get_notes():
 def delete_note(note_id):
     supabase.table("notes").delete().eq("id", note_id).execute()
 
+def check_password():
+    if "password_ok" not in st.session_state:
+        st.session_state.password_ok = False
+
+    if st.session_state.password_ok:
+        return True
+
+    password = st.text_input("비밀번호", type="password")
+
+    if st.button("로그인"):
+        if password == st.secrets["APP_PASSWORD"]:
+            st.session_state.password_ok = True
+            st.rerun()
+        else:
+            st.error("비밀번호가 틀렸습니다.")
+
+    return False
+
+
+if not check_password():
+    st.stop()
 
 st.title("📝 내 메모장")
 
