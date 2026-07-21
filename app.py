@@ -143,8 +143,11 @@ def image_to_base64(image_path: str) -> str:
         return base64.b64encode(image_file.read()).decode()
 
 
-def show_otter_header(message: str = "오늘 할 일을 시작해 볼까?"):
-    otter_base64 = image_to_base64("assets/otter_face.png")
+def show_otter_header(message: str = "오늘 할 일을 시작해 볼까?", flg: str = "otter"):
+    if flg == "otter":
+        otter_base64 = image_to_base64("assets/otter_face.png")
+    elif flg == "bear":
+        otter_base64 = image_to_base64("assets/bear_face.png")
 
     st.markdown(
         f"""
@@ -739,7 +742,9 @@ def admin_screen():
 # =========================
 def child_screen(child_name):
     if child_name == "율하":
-        show_otter_header()
+        show_otter_header(flg="otter")
+    elif child_name == "서하":
+        show_otter_header(flg="bear")
 
     st.title(f"{child_name} 체크리스트")
     back_to_role_select()
