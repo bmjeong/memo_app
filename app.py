@@ -38,6 +38,8 @@ def show_otter_header(message: str = "오늘 할 일을 시작해 볼까?", flg:
         otter_base64 = image_to_base64("assets/otter_face.png")
     elif flg == "bear":
         otter_base64 = image_to_base64("assets/bear_face.png")
+    elif flg == "turtle":
+        otter_base64 = image_to_base64("assets/turtle_face.png")
 
     st.markdown(
         f"""
@@ -255,7 +257,7 @@ def password_gate():
 def role_select_screen():
     st.title("누가 사용할까요?")
 
-    col1, col2, col3 = st.columns(3)
+    col1, col2, col3, col4 = st.columns(4)
 
     with col1:
         if st.button("관리자", use_container_width=True):
@@ -270,6 +272,11 @@ def role_select_screen():
     with col3:
         if st.button("서하", use_container_width=True):
             st.session_state["role"] = "서하"
+            st.rerun()
+
+    with col4:
+        if st.button("유주", use_container_width=True):
+            st.session_state["role"] = "유주"
             st.rerun()
 
 def back_to_role_select():
@@ -428,7 +435,7 @@ def admin_screen():
 
     child_name = st.selectbox(
         "누구의 체크리스트인가요?",
-        ["율하", "서하"],
+        ["율하", "서하", "유주"],
         key="admin_child_name"
     )
 
@@ -534,7 +541,7 @@ def admin_screen():
 
     list_child = st.selectbox(
         "조회할 아이",
-        ["전체", "율하", "서하"],
+        ["전체", "율하", "서하", "유주"],
         key="admin_list_child"
     )
 
@@ -638,7 +645,7 @@ def admin_screen():
     # --------------------------------------------------
     st.subheader("점수 현황")
 
-    score_col1, score_col2 = st.columns(2)
+    score_col1, score_col2, score_col3 = st.columns(3)
 
     with score_col1:
         total = calculate_total_score("율하")
@@ -647,6 +654,10 @@ def admin_screen():
     with score_col2:
         total = calculate_total_score("서하")
         st.metric("서하", f"{total}점")
+
+    with score_col3:
+        total = calculate_total_score("유주")
+        st.metric("유주", f"{total}점")
 
 # =========================
 # 아이 화면
@@ -675,6 +686,19 @@ def child_screen(child_name):
         if st.session_state.selected_date_서하_last != today:
             st.session_state.selected_date_서하 = today
             st.session_state.selected_date_서하_last = today
+
+    elif child_name == "유주":
+        show_otter_header(flg="turtle")
+        if "selected_date_유주_last" not in st.session_state:
+            st.session_state.selected_date_유주_last = today
+
+        if "selected_date_유주" not in st.session_state:
+            st.session_state.selected_date_유주 = today
+
+        if st.session_state.selected_date_유주_last != today:
+            st.session_state.selected_date_유주 = today
+            st.session_state.selected_date_유주_last = today
+    
 
     st.title(f"{child_name} 체크리스트")
     back_to_role_select()
@@ -858,7 +882,7 @@ def child_screen(child_name):
                 on_conflict="child_name,item_id,record_date"
             ).execute()
 
-            if child_name == "율하" and today_score > 0:
+            if today_score > 0:
                 st.session_state.otter_message = (
                     "오늘도 정말 잘했어!"
                 )
@@ -931,7 +955,7 @@ def main():
 
     if role == "admin":
         admin_screen()
-    elif role in ["율하", "서하"]:
+    elif role in ["율하", "서하", "유주"]:
         child_screen(role)
     else:
         st.error("잘못된 사용자입니다.")
